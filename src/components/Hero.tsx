@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Zap, Sparkles, Video, Play, CheckCircle2, ShieldCheck, ArrowRight } from 'lucide-react';
 import { Book3D } from './Book3D';
 
@@ -11,6 +11,29 @@ interface Props {
 export const Hero: React.FC<Props> = ({ onExploreClick, onDownloadClick, onPreviewClick }) => {
   const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [iframeLoaded, setIframeLoaded] = useState(false);
+
+  const TRAILER_ID = 'QdBZY2fkU-0';
+  // Preload: website open hote hi iframe silently background me load hoga
+  const iframeSrc = `https://www.youtube-nocookie.com/embed/${TRAILER_ID}?autoplay=0&rel=0&modestbranding=1&mute=1`;
+
+  // Preload iframe in DOM as soon as hero mounts (hidden, muted, autoplay=0)
+  const preloadRef = useRef<HTMLIFrameElement>(null);
+
+  useEffect(() => {
+    // After 2s delay (let page settle first), trigger iframe load
+    const t = setTimeout(() => {
+      if (preloadRef.current) {
+        preloadRef.current.src = iframeSrc;
+      }
+    }, 2000);
+    return () => clearTimeout(t);
+  }, [iframeSrc]);
+
+  const handleCloseTrailer = () => {
+    setIsVideoModalOpen(false);
+    setIframeLoaded(false);
+  };
 
   // User's exact local videos
   const videos = [
@@ -168,22 +191,57 @@ export const Hero: React.FC<Props> = ({ onExploreClick, onDownloadClick, onPrevi
         </div>
       </div>
 
-      {/* Official Trailer Modal */}
+      {/* ── Hidden Preload iframe (loads in background silently, muted, paused) ── */}
+      {/* Page open hote hi YouTube connection warm up hoti hai — modal open hote hi instant playback */}
+      <iframe
+        ref={preloadRef}
+        title="trailer-preload"
+        className="sr-only pointer-events-none"
+        style={{ position: 'fixed', width: 1, height: 1, opacity: 0, top: -9999, left: -9999 }}
+        allow="autoplay"
+      />
+
+      {/* Official Trailer Modal — Instant play (preloaded) */}
       {isVideoModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-fadeIn">
           <div className="relative w-full max-w-4xl aspect-video rounded-3xl overflow-hidden border border-[#ff007a]/50 shadow-[0_0_50px_rgba(255,0,122,0.4)] bg-black">
+            {/* Close Button */}
             <button
-              onClick={() => setIsVideoModalOpen(false)}
-              className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-black/70 hover:bg-black text-white border border-white/20"
+              onClick={handleCloseTrailer}
+              className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-black/70 hover:bg-black text-white border border-white/20 transition-all hover:border-[#ff007a]"
             >
               ✕
             </button>
+
+            {/* Loading shimmer shown while iframe initializes */}
+            {!iframeLoaded && (
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-black">
+                {/* Pulsing GTA VI logo */}
+                <div className="flex flex-col items-center gap-3 animate-pulse">
+                  <div className="text-5xl font-black font-gta italic text-transparent bg-clip-text bg-gradient-to-r from-[#ff007a] via-[#ff5e00] to-[#9d00ff] drop-shadow-[0_0_30px_rgba(255,0,122,0.9)]">
+                    VI
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#ff007a] animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-2 h-2 rounded-full bg-[#ff5e00] animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-2 h-2 rounded-full bg-[#00f0ff] animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                  <span className="text-sm font-rajdhani text-gray-400 uppercase tracking-widest">
+                    Loading Trailer…
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Live autoplay iframe */}
             <iframe
+              key="trailer-live"
               className="w-full h-full"
-              src="https://www.youtube.com/embed/QdBZY2fkU-0?autoplay=1&rel=0"
-              title="Grand Theft Auto VI Trailer 1"
+              src={`https://www.youtube-nocookie.com/embed/${TRAILER_ID}?autoplay=1&rel=0&modestbranding=1`}
+              title="Grand Theft Auto VI Official Trailer 1"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
+              onLoad={() => setIframeLoaded(true)}
             />
           </div>
         </div>
