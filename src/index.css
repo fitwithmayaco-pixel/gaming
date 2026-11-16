@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --gta-pink: #ff007a;
+    --gta-cyan: #00f0ff;
+    --gta-purple: #8b00ff;
+    --gta-orange: #ff6a00;
+    --gta-yellow: #ffb700;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #06050a;
+    color: #f1f1f5;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom GTA VI Typography & Utility Classes */
+.font-bebas {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.font-gta {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.font-rajdhani {
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.04em;
+}
+
+/* 3D Transform Utilities */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.perspective-1500 {
+  perspective: 1500px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* Realistic 3D Book Styling */
+.book-container {
+  perspective: 1400px;
+  transform-style: preserve-3d;
+}
+
+.book-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.book-spine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 32px;
+  background: linear-gradient(90deg, #181224 0%, #2f1d47 50%, #150f22 100%);
+  transform: rotateY(-90deg) translateZ(16px);
+  border-left: 2px solid rgba(255, 0, 122, 0.4);
+}
+
+.book-shadow {
+  box-shadow: -20px 25px 45px rgba(0, 0, 0, 0.8), 0 0 35px rgba(255, 0, 122, 0.3);
+}
+
+/* Vice City Sunset Gradients */
+.bg-gta-gradient {
+  background: linear-gradient(135deg, #ff007a 0%, #ff5e00 50%, #8b00ff 100%);
+}
+
+.text-gradient-gta {
+  background: linear-gradient(135deg, #ff0080, #ff8c00, #f802ca);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-cyan {
+  background: linear-gradient(135deg, #00f0ff, #0088ff, #7000ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Glowing Neon Borders & Shadows */
+.neon-border-pink {
+  box-shadow: 0 0 20px rgba(255, 0, 122, 0.5), inset 0 0 15px rgba(255, 0, 122, 0.2);
+  border-color: rgba(255, 0, 122, 0.8);
+}
+
+.neon-border-cyan {
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.5), inset 0 0 15px rgba(0, 240, 255, 0.2);
+  border-color: rgba(0, 240, 255, 0.8);
+}
+
+/* Scanline / CRT overlay */
+.scanlines {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.3) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.05),
+    rgba(0, 255, 0, 0.02),
+    rgba(0, 0, 255, 0.05)
+  );
+  background-size: 100% 3px, 3px 100%;
+  pointer-events: none;
+}
+
+/* Floating Animation */
+@keyframes float3D {
+  0%, 100% {
+    transform: translateY(0px) rotateY(-18deg) rotateX(10deg);
+  }
+  50% {
+    transform: translateY(-14px) rotateY(-12deg) rotateX(6deg);
+  }
+}
+
+.animate-float-3d {
+  animation: float3D 6s ease-in-out infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #06050a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #ff007a, #ff5e00);
+  border-radius: 4px;
+}
