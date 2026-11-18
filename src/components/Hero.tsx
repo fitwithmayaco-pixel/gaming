@@ -45,8 +45,8 @@ export const Hero: React.FC<Props> = ({ onExploreClick, onDownloadClick, onPrevi
 
   return (
     <div className="relative min-h-[96vh] flex items-center justify-center overflow-hidden pt-24 pb-16">
-      {/* Background Video Layer - Crisp HD Rendering (No scale distortion or artificial grid lines) */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
+      {/* Background Video Layer - Smooth Cinematic HD Treatment */}
+      <div className="absolute inset-0 z-0 overflow-hidden bg-[#06050a]">
         {/* Desktop Videos (Visible on screens md and up) */}
         <video
           key={`desktop-${currentVideo}`}
@@ -54,8 +54,11 @@ export const Hero: React.FC<Props> = ({ onExploreClick, onDownloadClick, onPrevi
           loop
           muted
           playsInline
-          className="hidden md:block w-full h-full object-cover object-center filter brightness-90 transition-all duration-700"
-          style={{ imageRendering: 'auto', transform: 'translateZ(0)' }}
+          className="hidden md:block w-full h-full object-cover object-center transition-all duration-700"
+          style={{
+            transform: 'translateZ(0)',
+            filter: 'brightness(0.85) contrast(1.04) blur(0.6px)',
+          }}
           src={currentVideo}
         />
 
@@ -66,15 +69,18 @@ export const Hero: React.FC<Props> = ({ onExploreClick, onDownloadClick, onPrevi
           loop
           muted
           playsInline
-          className="block md:hidden w-full h-full object-cover object-center filter brightness-90"
-          style={{ imageRendering: 'auto', transform: 'translateZ(0)' }}
+          className="block md:hidden w-full h-full object-cover object-center"
+          style={{
+            transform: 'translateZ(0)',
+            filter: 'brightness(0.88) contrast(1.04) blur(0.4px)',
+          }}
           src="/videos/gta6-bg-mobile.mp4"
         />
 
-        {/* Smooth Neon Cinematic Vignette (Soft depth without pixelation or harsh grain) */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#06050a] via-[#06050a]/20 to-transparent pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#ff007a]/10 via-transparent to-[#00f0ff]/10 mix-blend-screen pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,#06050a_95%)] pointer-events-none" />
+        {/* Smooth Neon Cinematic Vignette (Soft depth that hides compression noise) */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#06050a] via-[#06050a]/30 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#ff007a]/12 via-transparent to-[#00f0ff]/12 mix-blend-screen pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,#06050a_92%)] pointer-events-none" />
       </div>
 
       {/* Switch Background Video Pill - Visible on desktop */}
