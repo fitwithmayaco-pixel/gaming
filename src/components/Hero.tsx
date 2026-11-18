@@ -45,29 +45,40 @@ export const Hero: React.FC<Props> = ({ onExploreClick, onDownloadClick, onPrevi
 
   return (
     <div className="relative min-h-[96vh] flex items-center justify-center overflow-hidden pt-24 pb-16">
-      {/* Background Video Layer - Tuned for Vibrant Visibility & Authenticity */}
+      {/* Background Video Layer - Crisp HD Rendering (No scale distortion or artificial grid lines) */}
       <div className="absolute inset-0 z-0 overflow-hidden">
+        {/* Desktop Videos (Visible on screens md and up) */}
         <video
-          key={currentVideo}
+          key={`desktop-${currentVideo}`}
           autoPlay
           loop
           muted
           playsInline
-          className="w-full h-full object-cover scale-105 filter brightness-[0.78] contrast-115 saturate-125 transition-all duration-700"
+          className="hidden md:block w-full h-full object-cover object-center filter brightness-90 transition-all duration-700"
+          style={{ imageRendering: 'auto', transform: 'translateZ(0)' }}
           src={currentVideo}
         />
 
-        {/* Vice City Neon Gradient Vignette - Lightened so the action video shines through */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#06050a] via-[#06050a]/30 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#ff007a]/15 via-transparent to-[#00f0ff]/15 mix-blend-screen" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_25%,#06050a_98%)]" />
-        
-        {/* CRT Scanline Overlay - Subtle and cinematic */}
-        <div className="absolute inset-0 scanlines opacity-15 pointer-events-none" />
+        {/* Mobile Dedicated Video (Visible on mobile screens < md) */}
+        <video
+          key="mobile-video"
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="block md:hidden w-full h-full object-cover object-center filter brightness-90"
+          style={{ imageRendering: 'auto', transform: 'translateZ(0)' }}
+          src="/videos/gta6-bg-mobile.mp4"
+        />
+
+        {/* Smooth Neon Cinematic Vignette (Soft depth without pixelation or harsh grain) */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#06050a] via-[#06050a]/20 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#ff007a]/10 via-transparent to-[#00f0ff]/10 mix-blend-screen pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,#06050a_95%)] pointer-events-none" />
       </div>
 
-      {/* Switch Background Video Pill */}
-      <div className="absolute top-24 right-6 z-30">
+      {/* Switch Background Video Pill - Visible on desktop */}
+      <div className="absolute top-24 right-6 z-30 hidden md:block">
         <button
           onClick={() => setActiveVideoIndex((prev) => (prev === 0 ? 1 : 0))}
           className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 hover:bg-black/85 backdrop-blur-xl border border-white/20 text-xs font-rajdhani font-bold text-gray-200 hover:text-white transition-all shadow-xl hover:border-[#ff007a]"
