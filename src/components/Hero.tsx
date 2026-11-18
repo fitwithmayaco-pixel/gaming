@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Zap, Sparkles, Video, Play, CheckCircle2, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Zap, Sparkles, Play, CheckCircle2, ShieldCheck, ArrowRight } from 'lucide-react';
 import { Book3D } from './Book3D';
 
 interface Props {
@@ -9,19 +9,16 @@ interface Props {
 }
 
 export const Hero: React.FC<Props> = ({ onExploreClick, onDownloadClick, onPreviewClick }) => {
-  const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
 
+  // Official YouTube Trailer (Original fast embed with preloader)
   const TRAILER_ID = 'QdBZY2fkU-0';
-  // Preload: website open hote hi iframe silently background me load hoga
   const iframeSrc = `https://www.youtube-nocookie.com/embed/${TRAILER_ID}?autoplay=0&rel=0&modestbranding=1&mute=1`;
-
-  // Preload iframe in DOM as soon as hero mounts (hidden, muted, autoplay=0)
   const preloadRef = useRef<HTMLIFrameElement>(null);
 
+  // Preload YouTube iframe connection in background
   useEffect(() => {
-    // After 2s delay (let page settle first), trigger iframe load
     const t = setTimeout(() => {
       if (preloadRef.current) {
         preloadRef.current.src = iframeSrc;
@@ -35,63 +32,104 @@ export const Hero: React.FC<Props> = ({ onExploreClick, onDownloadClick, onPrevi
     setIframeLoaded(false);
   };
 
-  // User's exact local videos
-  const videos = [
-    '/videos/gta6-bg-video1.mp4',
-    '/videos/gta6-bg-video2.mp4',
-  ];
+  // User's 4K GTA VI Trailer 2 video in hero background
+  const desktopVideoSrc = '/videos/GTAVI_Trailer_2.mp4';
+  const localCoverThumbnail = '/images/gta6-cover1.jpeg';
+  // Skip the first 7.5 seconds so Rockstar Games logo / rating card is cropped out
+  const CROP_START_TIME = 7.5;
 
-  const currentVideo = videos[activeVideoIndex];
+  const desktopVideoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = desktopVideoRef.current;
+    if (video) {
+      video.muted = true;
+      video.defaultMuted = true;
+
+      const playVideo = () => {
+        try {
+          if (video.currentTime < CROP_START_TIME) {
+            video.currentTime = CROP_START_TIME;
+          }
+        } catch (e) {}
+        video.play().catch(() => {});
+      };
+
+      if (video.readyState >= 2) {
+        playVideo();
+      } else {
+        video.addEventListener('canplay', playVideo, { once: true });
+        video.addEventListener('loadeddata', playVideo, { once: true });
+      }
+    }
+  }, []);
+
+  const handleLoadedMetadata = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+    const video = e.currentTarget;
+    if (video.currentTime < CROP_START_TIME) {
+      video.currentTime = CROP_START_TIME;
+    }
+    video.play().catch(() => {});
+  };
+
+  const handleTimeUpdate = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+    const video = e.currentTarget;
+    // Loop seamlessly without ever showing Rockstar logo
+    if (video.currentTime < CROP_START_TIME && video.currentTime > 0.05) {
+      video.currentTime = CROP_START_TIME;
+    }
+  };
+
+  const handleEnded = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+    const video = e.currentTarget;
+    video.currentTime = CROP_START_TIME;
+    video.play().catch(() => {});
+  };
 
   return (
     <div className="relative min-h-[96vh] flex items-center justify-center overflow-hidden pt-24 pb-16">
-      {/* Background Video Layer - Smooth Cinematic HD Treatment */}
+      {/* Background Layer - 4K High Resolution Video with Local Thumbnail Fallback */}
       <div className="absolute inset-0 z-0 overflow-hidden bg-[#06050a]">
-        {/* Desktop Videos (Visible on screens md and up) */}
+        {/* Instant Local GTA VI Cover Placeholder (Screen is NEVER empty while video loads) */}
+        <img
+          src={localCoverThumbnail}
+          alt="GTA VI Cover Preview"
+          className="absolute inset-0 w-full h-full object-cover object-center filter brightness-85 pointer-events-none"
+        />
+
+        {/* Desktop 4K GTA VI Trailer 2 Video (Cropped: Rockstar logo removed) */}
         <video
-          key={`desktop-${currentVideo}`}
+          ref={desktopVideoRef}
+          key="desktop-trailer2-4k"
           autoPlay
           loop
           muted
           playsInline
-          className="hidden md:block w-full h-full object-cover object-center transition-all duration-700"
-          style={{
-            transform: 'translateZ(0)',
-            filter: 'brightness(0.85) contrast(1.04) blur(0.6px)',
-          }}
-          src={currentVideo}
-        />
+          onLoadedMetadata={handleLoadedMetadata}
+          onTimeUpdate={handleTimeUpdate}
+          onEnded={handleEnded}
+          className="hidden md:block absolute inset-0 w-full h-full object-cover object-center filter brightness-90"
+          style={{ transform: 'translateZ(0)' }}
+        >
+          <source src={desktopVideoSrc} type="video/mp4" />
+        </video>
 
         {/* Mobile Dedicated Video (Visible on mobile screens < md) */}
         <video
-          key="mobile-video"
+          key="mobile-gameplay-video"
           autoPlay
           loop
           muted
           playsInline
-          className="block md:hidden w-full h-full object-cover object-center"
-          style={{
-            transform: 'translateZ(0)',
-            filter: 'brightness(0.88) contrast(1.04) blur(0.4px)',
-          }}
+          className="block md:hidden absolute inset-0 w-full h-full object-cover object-center filter brightness-90"
+          style={{ transform: 'translateZ(0)' }}
           src="/videos/gta6-bg-mobile.mp4"
         />
 
-        {/* Smooth Neon Cinematic Vignette (Soft depth that hides compression noise) */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#06050a] via-[#06050a]/30 to-transparent pointer-events-none" />
+        {/* Smooth Neon Cinematic Vignette */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#06050a] via-[#06050a]/25 to-transparent pointer-events-none" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#ff007a]/12 via-transparent to-[#00f0ff]/12 mix-blend-screen pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,#06050a_92%)] pointer-events-none" />
-      </div>
-
-      {/* Switch Background Video Pill - Visible on desktop */}
-      <div className="absolute top-24 right-6 z-30 hidden md:block">
-        <button
-          onClick={() => setActiveVideoIndex((prev) => (prev === 0 ? 1 : 0))}
-          className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 hover:bg-black/85 backdrop-blur-xl border border-white/20 text-xs font-rajdhani font-bold text-gray-200 hover:text-white transition-all shadow-xl hover:border-[#ff007a]"
-        >
-          <Video className="w-3.5 h-3.5 text-[#00f0ff]" />
-          <span>Switch Video Background ({activeVideoIndex + 1}/2)</span>
-        </button>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,#06050a_92%)] pointer-events-none" />
       </div>
 
       {/* Hero Container */}
@@ -218,7 +256,7 @@ export const Hero: React.FC<Props> = ({ onExploreClick, onDownloadClick, onPrevi
         allow="autoplay"
       />
 
-      {/* Official Trailer Modal — Instant play (preloaded) */}
+      {/* Official YouTube Trailer Modal — With Animated GTA VI Loading Screen */}
       {isVideoModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-fadeIn">
           <div className="relative w-full max-w-4xl aspect-video rounded-3xl overflow-hidden border border-[#ff007a]/50 shadow-[0_0_50px_rgba(255,0,122,0.4)] bg-black">
